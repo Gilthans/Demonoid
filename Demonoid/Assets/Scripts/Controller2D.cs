@@ -19,7 +19,7 @@ public class Controller2D : MonoBehaviour
 	float horizontalRaySpacing = 0;
 	float verticalRaySpacing = 0;
 
-	private BoxCollider2D _collider;
+	public BoxCollider2D _collider;
 	private Animator _animator;
 
 	private bool _isFacingRight = true;
@@ -43,12 +43,6 @@ public class Controller2D : MonoBehaviour
 		SetAnimatorProperties(velocity);
 
 		transform.Translate(velocity);
-
-		if(transform.position.y < -8)
-		{
-			Scene scene = SceneManager.GetActiveScene();
-			SceneManager.LoadScene(scene.name);
-		}
 	}
 
 	private void SetAnimatorProperties(Vector3 velocity)
@@ -99,6 +93,7 @@ public class Controller2D : MonoBehaviour
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
 			if (hit)
 			{
+				collisionInfo.Objects.Add(hit.collider.gameObject);
 				velocity.y = (hit.distance - SKIN_WIDTH) * directionY;
 				rayLength = hit.distance;
 
@@ -120,6 +115,8 @@ public class Controller2D : MonoBehaviour
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
 			if (hit)
 			{
+				collisionInfo.Objects.Add(hit.collider.gameObject);
+
 				float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 				if (slopeAngle != collisionInfo.slopeAngle)
 				{
@@ -146,6 +143,8 @@ public class Controller2D : MonoBehaviour
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
 			if (hit)
 			{
+				collisionInfo.Objects.Add(hit.collider.gameObject);
+
 				float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
 				if (i == 0 && slopeAngle <= MAX_CLIMB_ANGLE)
@@ -205,6 +204,8 @@ public class Controller2D : MonoBehaviour
 		RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, Mathf.Infinity, collisionMask);
 		if (hit)
 		{
+			collisionInfo.Objects.Add(hit.collider.gameObject);
+
 			float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 			var slopeAngleRadians = slopeAngle * Mathf.Deg2Rad;
 			if (slopeAngle != 0 && slopeAngle <= MAX_DESCEND_ANGLE)

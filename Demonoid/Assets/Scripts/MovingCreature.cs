@@ -19,9 +19,9 @@ public abstract class MovingCreature : MonoBehaviour
 		_InputSource = inputSource;
 	}
 
-	float velocityXSmoothing;
-	Vector3 velocity;
-	Controller2D controller;
+	protected float velocityXSmoothing;
+	protected Vector3 velocity;
+	protected Controller2D controller;
 
 	private bool IsGrounded
 	{
@@ -38,7 +38,7 @@ public abstract class MovingCreature : MonoBehaviour
 		JUMP_SPEED = -GRAVITY * TIME_TO_JUMP_APEX;
 	}
 
-	void Update()
+	public virtual void Update()
 	{
 		Vector2 input = _InputSource.GetMovementVector();
 
