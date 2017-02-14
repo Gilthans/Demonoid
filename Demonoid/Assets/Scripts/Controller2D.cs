@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class Controller2D : MonoBehaviour
@@ -42,6 +43,12 @@ public class Controller2D : MonoBehaviour
 		SetAnimatorProperties(velocity);
 
 		transform.Translate(velocity);
+
+		if(transform.position.y < -8)
+		{
+			Scene scene = SceneManager.GetActiveScene();
+			SceneManager.LoadScene(scene.name);
+		}
 	}
 
 	private void SetAnimatorProperties(Vector3 velocity)
@@ -254,21 +261,5 @@ public class Controller2D : MonoBehaviour
 	{
 		public Vector2 topLeft, topRight;
 		public Vector2 bottomLeft, bottomRight;
-	}
-
-	public struct CollisionInfo
-	{
-		public bool above, below;
-		public bool left, right;
-		public bool climbingSlope;
-		public bool descendingSlope;
-
-		public float slopeAngle, slopeAngleOld;
-		public void Reset()
-		{
-			descendingSlope = climbingSlope = above = below = left = right = false;
-			slopeAngleOld = slopeAngle;
-			slopeAngle = 0;
-		}
 	}
 }
