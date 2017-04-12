@@ -141,41 +141,40 @@ public class Controller2D : MonoBehaviour
 			Debug.DrawRay(rayOrigin, 2 * rayLength * Vector2.right * directionX, Color.green);
 
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
-			if (hit)
+			if (!hit)
+				continue;
+
+			collisionInfo.Objects.Add(hit.collider.gameObject);
+
+			float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+			if (i == 0 && slopeAngle <= MAX_CLIMB_ANGLE)
 			{
-				collisionInfo.Objects.Add(hit.collider.gameObject);
-
-				float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-
-				if (i == 0 && slopeAngle <= MAX_CLIMB_ANGLE)
+				float distanceToSlopeStart = 0;
+				if (slopeAngle != collisionInfo.slopeAngleOld)
 				{
-					float distanceToSlopeStart = 0;
-					if (slopeAngle != collisionInfo.slopeAngleOld)
-					{
-						distanceToSlopeStart = hit.distance - SKIN_WIDTH;
-						velocity.x -= distanceToSlopeStart * directionX;
-					}
-
-					ClimbSlope(ref velocity, slopeAngle);
-
-					velocity.x += distanceToSlopeStart * directionX;
+					distanceToSlopeStart = hit.distance - SKIN_WIDTH;
+					velocity.x -= distanceToSlopeStart * directionX;
 				}
 
-				if (collisionInfo.climbingSlope && slopeAngle <= MAX_CLIMB_ANGLE)
-					continue;
+				ClimbSlope(ref velocity, slopeAngle);
 
-				velocity.x = (hit.distance - SKIN_WIDTH) * directionX;
-				rayLength = hit.distance;
-
-				if (collisionInfo.climbingSlope)
-					velocity.y = Mathf.Tan(collisionInfo.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
-
-				if (directionX > 0)
-					collisionInfo.right = true;
-				if (directionX < 0)
-					collisionInfo.left = true;
+				velocity.x += distanceToSlopeStart * directionX;
 			}
 
+			if (collisionInfo.climbingSlope && slopeAngle <= MAX_CLIMB_ANGLE)
+				continue;
+
+			velocity.x = (hit.distance - SKIN_WIDTH) * directionX;
+			rayLength = hit.distance;
+
+			if (collisionInfo.climbingSlope)
+				velocity.y = Mathf.Tan(collisionInfo.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+
+			if (directionX > 0)
+				collisionInfo.right = true;
+			if (directionX < 0)
+				collisionInfo.left = true;
 		}
 	}
 
