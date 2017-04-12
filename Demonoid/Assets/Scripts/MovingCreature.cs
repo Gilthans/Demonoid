@@ -4,24 +4,26 @@ using System.Collections;
 [RequireComponent(typeof(Controller2D))]
 public abstract class MovingCreature : MonoBehaviour
 {
+	private float TIME_TO_JUMP_APEX = .4f;
+
 	public float JUMP_HEIGHT = 3.5f;
-	public float TIME_TO_JUMP_APEX = .4f;
 	public float MOVE_SPEED = 12;
 	public float MOVE_ACCELERATION_TIME_AIRBORNE = .2f;
 	public float MOVE_ACCELERATION_TIME_GROUNDED = .07f;
 
 	private float JUMP_SPEED;
-	private float GRAVITY;
-	private readonly IInputSource _InputSource;
+	private Vector2 GRAVITY;
+	protected IInputSource _InputSource;
 
-	protected MovingCreature(IInputSource inputSource)
+	protected MovingCreature(IInputSource inputSource = null)
 	{
 		_InputSource = inputSource;
 	}
 
 	protected float velocityXSmoothing;
-	protected Vector3 velocity;
+	protected Vector2 velocity;
 	protected Controller2D controller;
+	private bool _isFacingRight = true;
 
 	private bool IsGrounded
 	{
@@ -31,11 +33,11 @@ public abstract class MovingCreature : MonoBehaviour
 		}
 	}
 
-	void Start()
+	public virtual void Start()
 	{
 		controller = GetComponent<Controller2D>();
-		GRAVITY = -2 * JUMP_HEIGHT / (TIME_TO_JUMP_APEX * TIME_TO_JUMP_APEX);
-		JUMP_SPEED = -GRAVITY * TIME_TO_JUMP_APEX;
+		GRAVITY = new Vector2(0, -2 * JUMP_HEIGHT / (TIME_TO_JUMP_APEX * TIME_TO_JUMP_APEX));
+		JUMP_SPEED = -GRAVITY.y * TIME_TO_JUMP_APEX;
 	}
 
 	public virtual void Update()
@@ -52,10 +54,24 @@ public abstract class MovingCreature : MonoBehaviour
 			velocity.y = JUMP_SPEED;
 		}
 
+		if ((input.x > 0 && !_isFacingRight) ||
+			(input.x < 0 && _isFacingRight))
+		{
+			FlipDirection(input);
+		}
+
 		float targetVelocityX = input.x * MOVE_SPEED;
 		velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, IsGrounded ? MOVE_ACCELERATION_TIME_GROUNDED : MOVE_ACCELERATION_TIME_AIRBORNE);
 
-		velocity.y += GRAVITY * Time.deltaTime;
+		velocity += GRAVITY * Time.deltaTime;
 		controller.Move(velocity * Time.deltaTime);
+	}
+
+	private void FlipDirection(Vector2 velocity)
+	{
+		_isFacingRight = velocity.x > 0;
+		Vector3 theScale = transform.localScale;
+		theScale.x *= -1;
+		transform.localScale = theScale;
 	}
 }

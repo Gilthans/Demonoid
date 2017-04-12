@@ -16,10 +16,17 @@ public class Player : MovingCreature
 		base.Update();
 
 		if (transform.position.y < -8)
+		{
+			Debug.Log("Out of bounds!");
 			Die();
+		}
 
 		if (this.controller.collisionInfo.Objects.Any(o => o.layer == LayerMask.NameToLayer("Enemies")))
+		{
+			// TODO: This sometimes triggers when you're over an enemy...
+			Debug.Log("Touched enemy!");
 			Die();
+		}
 	}
 
 	private static void Die()

@@ -22,8 +22,6 @@ public class Controller2D : MonoBehaviour
 	public BoxCollider2D _collider;
 	private Animator _animator;
 
-	private bool _isFacingRight = true;
-
 	private RaycastOrigins _raycastOrigins;
 
 	public CollisionInfo collisionInfo;
@@ -53,21 +51,7 @@ public class Controller2D : MonoBehaviour
 		_animator.SetBool("Ground", collisionInfo.below);
 		_animator.SetBool("Crouch", false);
 		_animator.SetFloat("Speed", Math.Abs(velocity.x));
-		if ((velocity.x < 0 && _isFacingRight) ||
-			(velocity.x > 0 && !_isFacingRight))
-		{
-			// TODO: There is a bug when walking into a wall where it momentarily flips
-			FlipDirection(velocity);
-		}
 		_animator.SetFloat("vSpeed", velocity.y);
-	}
-
-	private void FlipDirection(Vector3 velocity)
-	{
-		_isFacingRight = velocity.x > 0;
-		Vector3 theScale = transform.localScale;
-		theScale.x *= -1;
-		transform.localScale = theScale;
 	}
 
 	void Start()
